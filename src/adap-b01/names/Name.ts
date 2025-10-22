@@ -19,8 +19,13 @@ export class Name {
     private components: string[] = [];
 
     /** Expects that all Name components are properly masked */
+    // @methodtype initialization-method
     constructor(other: string[], delimiter?: string) {
-        throw new Error("needs implementation or deletion");
+        if (delimiter) {
+            this.delimiter = delimiter;
+        }
+
+        this.components = other;
     }
 
     /**
@@ -28,8 +33,11 @@ export class Name {
      * Special characters are not escaped (creating a human-readable string)
      * Users can vary the delimiter character to be used
      */
+    // @methodtype conversion-method
     public asString(delimiter: string = this.delimiter): string {
-        throw new Error("needs implementation or deletion");
+        const componentsSeperatedByDelimiter: string = this.components.join(delimiter);
+
+        return componentsSeperatedByDelimiter;
     }
 
     /** 
@@ -37,36 +45,90 @@ export class Name {
      * Machine-readable means that from a data string, a Name can be parsed back in
      * The special characters in the data string are the default characters
      */
+    // @methodtype conversion-method
     public asDataString(): string {
-        throw new Error("needs implementation or deletion");
+        const maskedComponents: string[] = this.components.map(component => this.asMaskedComponent(component));
+        const maskedComponentsSeperatedByDelimiter: string = maskedComponents.join(DEFAULT_DELIMITER);
+
+        return maskedComponentsSeperatedByDelimiter;
     }
 
+    /** Escapes all delimiters after escaping the escape character */
+    // @methodtype conversion-method
+    private asMaskedComponent(c: string): string {
+        let maskedComponent: string = c.replaceAll(
+            ESCAPE_CHARACTER, 
+            `${ESCAPE_CHARACTER}${ESCAPE_CHARACTER}`
+        );
+
+        maskedComponent = maskedComponent.replaceAll(
+            DEFAULT_DELIMITER, 
+            `${ESCAPE_CHARACTER}${DEFAULT_DELIMITER}`
+        );
+
+        return maskedComponent;
+    }
+
+    // @methodtype get-method
     public getComponent(i: number): string {
-        throw new Error("needs implementation or deletion");
+        if (!this.isValidIndexForComponentsArray(i)) {
+            console.error(`${i} is not a valid index for the components array!`);
+            return "";
+        }
+
+        return this.components[i];
     }
 
     /** Expects that new Name component c is properly masked */
+    // @methodtype set-method
     public setComponent(i: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        if (!this.isValidIndexForComponentsArray(i)) {
+            console.error(`${i} is not a valid index for the components array!`);
+            return;
+        }
+
+        this.components[i] = c;
     }
 
-     /** Returns number of components in Name instance */
-     public getNoComponents(): number {
-        throw new Error("needs implementation or deletion");
+    /** Returns number of components in Name instance */
+    // @methodtype get-method
+    public getNoComponents(): number {
+        return this.components.length;
     }
 
     /** Expects that new Name component c is properly masked */
+    // @methodtype command-method
     public insert(i: number, c: string): void {
-        throw new Error("needs implementation or deletion");
+        const isValidInsertIndex: boolean = Number.isInteger(i) && i >= 0 && i <= this.components.length;
+        if (!isValidInsertIndex) {
+            console.error(`${i} is not a valid *insertion* index for the components array!`);
+            return;
+        }
+
+        this.components.splice(i, 0, c);
     }
 
     /** Expects that new Name component c is properly masked */
+    // @methodtype command-method
     public append(c: string): void {
-        throw new Error("needs implementation or deletion");
+        this.components.push(c);
     }
 
+    // @methodtype command-method
     public remove(i: number): void {
-        throw new Error("needs implementation or deletion");
+        if (!this.isValidIndexForComponentsArray(i)) {
+            console.error(`${i} is not a valid index for the components array!`);
+            return;
+        }
+        
+        this.components.splice(i, 1);
     }
 
+    // @methodtype boolean-query-method
+    private isValidIndexForComponentsArray(i: number): boolean {
+        const isInteger: boolean = Number.isInteger(i);
+        const isInBounds: boolean = i >= 0 && i < this.components.length;
+
+        return isInteger && isInBounds;
+    }
 }
