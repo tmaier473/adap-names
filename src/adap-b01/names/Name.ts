@@ -70,6 +70,7 @@ export class Name {
     }
 
     // @methodtype get-method
+    /** Returns properly masked component string */
     public getComponent(i: number): string {
         if (!this.isValidIndexForComponentsArray(i)) {
             console.error(`${i} is not a valid index for the components array!`);
