@@ -17,10 +17,10 @@ export class StringName implements Name {
 
     this.setName(source);
     const components: string[] = this.getComponents();
-    this.setNoComponents(components.length)
+    this.setNoComponents(components.length);
   }
 
-    public getDelimiterCharacter(): string {
+  public getDelimiterCharacter(): string {
     return this.doGetDelimiterCharacter();
   }
 
@@ -75,8 +75,7 @@ export class StringName implements Name {
 
   public asString(delimiter: string = this.delimiter): string {
     const components: string[] = this.getComponents();
-    const componentsSeperatedByDelimiter: string =
-      components.join(delimiter);
+    const componentsSeperatedByDelimiter: string = components.join(delimiter);
 
     return componentsSeperatedByDelimiter;
   }
@@ -87,7 +86,7 @@ export class StringName implements Name {
       this.asMaskedComponent(component)
     );
     const maskedComponentsSeperatedByDelimiter: string =
-      maskedComponents.join(this.getDelimiterCharacter());
+      maskedComponents.join(DEFAULT_DELIMITER);
 
     return maskedComponentsSeperatedByDelimiter;
   }
@@ -100,15 +99,19 @@ export class StringName implements Name {
     );
 
     maskedComponent = maskedComponent.replaceAll(
-      this.getDelimiterCharacter(),
-      `${ESCAPE_CHARACTER}${this.getDelimiterCharacter()}`
+      DEFAULT_DELIMITER,
+      `${ESCAPE_CHARACTER}${DEFAULT_DELIMITER}`
     );
 
     return maskedComponent;
   }
 
   public isEmpty(): boolean {
-    return this.getNoComponents() === 0;
+    const components = this.asString().split(this.getDelimiterCharacter());
+    return (
+      components.length === 0 ||
+      (components.length === 1 && components[0] === "")
+    );
   }
 
   public getComponent(x: number): string {

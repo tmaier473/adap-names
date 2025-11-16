@@ -33,7 +33,7 @@ export class StringArrayName implements Name {
     this.delimiter = delimiter;
   }
 
-    private getComponents(): string[] {
+  private getComponents(): string[] {
     return this.doGetComponents();
   }
 
@@ -51,8 +51,7 @@ export class StringArrayName implements Name {
 
   public asString(delimiter: string = this.delimiter): string {
     const components: string[] = this.getComponents();
-    const componentsSeperatedByDelimiter: string =
-      components.join(delimiter);
+    const componentsSeperatedByDelimiter: string = components.join(delimiter);
 
     return componentsSeperatedByDelimiter;
   }
@@ -63,7 +62,7 @@ export class StringArrayName implements Name {
       this.asMaskedComponent(component)
     );
     const maskedComponentsSeperatedByDelimiter: string =
-      maskedComponents.join(this.getDelimiterCharacter());
+      maskedComponents.join(DEFAULT_DELIMITER);
 
     return maskedComponentsSeperatedByDelimiter;
   }
@@ -76,15 +75,19 @@ export class StringArrayName implements Name {
     );
 
     maskedComponent = maskedComponent.replaceAll(
-      this.getDelimiterCharacter(),
-      `${ESCAPE_CHARACTER}${this.getDelimiterCharacter()}`
+      DEFAULT_DELIMITER,
+      `${ESCAPE_CHARACTER}${DEFAULT_DELIMITER}`
     );
 
     return maskedComponent;
   }
 
   public isEmpty(): boolean {
-    return this.getNoComponents() === 0;
+    const components = this.getComponents();
+    return (
+      components.length === 0 ||
+      (components.length === 1 && components[0] === "")
+    );
   }
 
   public getNoComponents(): number {
@@ -109,7 +112,7 @@ export class StringArrayName implements Name {
     }
 
     const components: string[] = this.getComponents();
-    components[i] = c
+    components[i] = c;
     this.setComponents(components);
   }
 
@@ -147,8 +150,7 @@ export class StringArrayName implements Name {
 
   public concat(other: Name): void {
     const delimiter: string = this.getDelimiterCharacter();
-    const concatAsString =
-      this.asString() + delimiter + other.asString();
+    const concatAsString = this.asString() + delimiter + other.asString();
     this.setComponents(concatAsString.split(delimiter));
   }
 
