@@ -7,7 +7,11 @@ export class StringArrayName extends AbstractName {
 
   constructor(source: string[], delimiter?: string) {
     super(delimiter);
-    this.components = source;
+    this.components = [...source];
+  }
+
+  protected doClone(components: string[]): Name {
+    return new StringArrayName(components, this.delimiter);
   }
 
   public getNoComponents(): number {
@@ -15,14 +19,32 @@ export class StringArrayName extends AbstractName {
   }
 
   public getComponent(i: number): string {
+    if (!this.isValidIndexForComponentsArray(i)) {
+      console.error(`${i} is not a valid index for the components array!`);
+      return "";
+    }
+
     return this.components[i];
   }
 
   public setComponent(i: number, c: string): void {
+    if (!this.isValidIndexForComponentsArray(i)) {
+      console.error(`${i} is not a valid index for the components array!`);
+      return;
+    }
+
     this.components[i] = c;
   }
 
   public insert(i: number, c: string): void {
+    const isValidInsertIndex: boolean =
+      Number.isInteger(i) && i >= 0 && i <= this.getNoComponents();
+    if (!isValidInsertIndex) {
+      console.error(
+        `${i} is not a valid *insertion* index for the components array!`
+      );
+      return;
+    }
     this.components.splice(i, 0, c);
   }
 
@@ -31,6 +53,11 @@ export class StringArrayName extends AbstractName {
   }
 
   public remove(i: number): void {
+    if (!this.isValidIndexForComponentsArray(i)) {
+      console.error(`${i} is not a valid index for the components array!`);
+      return;
+    }
+
     this.components.splice(i, 1);
   }
 }

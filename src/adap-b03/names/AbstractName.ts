@@ -16,9 +16,10 @@ export abstract class AbstractName implements Name {
     for (let i = 0; i < this.getNoComponents(); i++) {
       components.push(this.getComponent(i));
     }
-    // Array-Version in StringArrayName, String-Version in StringName
-    return new (this.constructor as any)(components, this.delimiter);
+    return this.doClone(components);
   }
+
+  protected abstract doClone(components: string[]): Name;
 
   public asString(delimiter: string = this.delimiter): string {
     const components: string[] = [];
@@ -64,11 +65,11 @@ export abstract class AbstractName implements Name {
   }
 
   public getHashCode(): number {
-    let hash = 17;
+    let hash = 0;
     for (let i = 0; i < this.getNoComponents(); i++) {
-      const comp = this.getComponent(i);
-      for (let c of comp) {
-        hash = hash * 31 + c.charCodeAt(0);
+      const component = this.getComponent(i);
+      for (let j = 0; j < component.length; j++) {
+        hash = hash * 31 + component.charCodeAt(j);
       }
     }
     return hash;
@@ -86,6 +87,13 @@ export abstract class AbstractName implements Name {
     for (let i = 0; i < other.getNoComponents(); i++) {
       this.append(other.getComponent(i));
     }
+  }
+
+  protected isValidIndexForComponentsArray(i: number): boolean {
+    const isInteger: boolean = Number.isInteger(i);
+    const isInBounds: boolean = i >= 0 && i < this.getNoComponents();
+
+    return isInteger && isInBounds;
   }
 
   abstract getNoComponents(): number;
