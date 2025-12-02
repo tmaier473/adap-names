@@ -64,7 +64,7 @@ describe("Buggy setup test", () => {
     try {
       let fs: RootNode = createBuggySetup();
       fs.findNodes("ls");
-    } catch(er) {
+    } catch (er) {
       threwException = true;
       // let ex: Exception = er as Exception;
       // expect(ex).toBeInstanceOf(ServiceFailureException);
