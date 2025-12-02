@@ -59,13 +59,14 @@ export class StringName extends AbstractName {
   public append(c: string): void {
     this.assertIsMaskedAsPrecondition(c);
 
-    const components: string[] = this.getComponents();
-    this.noComponents = components.push(c);
-    this.name = components.join(this.getDelimiterCharacter());
+    const oldComponents: string[] = this.getComponents();
+    oldComponents.push(c);
+    this.name = oldComponents.join(this.getDelimiterCharacter());
+    this.noComponents = oldComponents.length;
 
     this.assertClassInvariant();
 
-    this.assertAppendPostcondition(c, components);
+    this.assertAppendPostcondition(c, oldComponents.slice(0, -1));
   }
   public remove(i: number): void {
     this.assertValidIndexAsPrecondition(i);

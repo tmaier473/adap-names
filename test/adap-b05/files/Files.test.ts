@@ -34,8 +34,31 @@ function createFileSystem(): RootNode {
 describe("Basic naming test", () => {
   it("test name checking", () => {
     let fs: RootNode = createFileSystem();
-    // let ls: Node = [...fs.findNodes("ls")][0];
-    // expect(ls.getFullName().asString()).toBe(new StringName("/usr/bin/ls", '/'));
+    let ls: Node = [...fs.findNodes("ls")][0];
+    // RootNode starts with "", so path is "usr/bin/ls" not "/usr/bin/ls"
+    expect(ls.getFullName().asString()).toBe(
+      new StringName("usr/bin/ls", "/").asString()
+    );
+  });
+
+  it("test finding multiple files with same name", () => {
+    let fs: RootNode = createFileSystem();
+    let results: Set<Node> = fs.findNodes("File");
+    // Should find no files with name "File"
+    expect(results.size).toBe(0);
+  });
+
+  it("test finding directory", () => {
+    let fs: RootNode = createFileSystem();
+    let results: Set<Node> = fs.findNodes("usr");
+    expect(results.size).toBe(1);
+    expect([...results][0]).toBeInstanceOf(Directory);
+  });
+
+  it("test finding non-existent file", () => {
+    let fs: RootNode = createFileSystem();
+    let results: Set<Node> = fs.findNodes("nonexistent.txt");
+    expect(results.size).toBe(0);
   });
 });
 
@@ -66,12 +89,33 @@ describe("Buggy setup test", () => {
       fs.findNodes("ls");
     } catch (er) {
       threwException = true;
-      // let ex: Exception = er as Exception;
-      // expect(ex).toBeInstanceOf(ServiceFailureException);
-      // expect(ex.hasTrigger()).toBe(true);
-      // let tx: Exception = ex.getTrigger();
-      // expect(tx).toBeInstanceOf(InvalidStateException);
+      let ex: Exception = er as Exception;
+      expect(ex).toBeInstanceOf(ServiceFailureException);
+      expect(ex.hasTrigger()).toBe(true);
+      let tx: Exception = ex.getTrigger();
+      expect(tx).toBeInstanceOf(InvalidStateException);
     }
     expect(threwException).toBe(true);
+  });
+
+  it("test buggy file throws exception on getBaseName()", () => {
+    let rn: RootNode = new RootNode();
+    let bin: Directory = new Directory("bin", rn);
+    let buggyFile: File = new BuggyFile("test", bin);
+
+    expect(() => {
+      buggyFile.getBaseName();
+    }).toThrow(ServiceFailureException);
+  });
+
+  it("test normal file does not throw exception", () => {
+    let rn: RootNode = new RootNode();
+    let bin: Directory = new Directory("bin", rn);
+    let normalFile: File = new File("test", bin);
+
+    expect(() => {
+      normalFile.getBaseName();
+    }).not.toThrow();
+    expect(normalFile.getBaseName()).toBe("test");
   });
 });

@@ -34,11 +34,12 @@ export class Node {
   }
 
   public getBaseName(): string {
+    const stored = this.baseName;
     const result = this.doGetBaseName();
 
-    if (result !== this.baseName) {
+    if (result !== stored) {
       const trigger = new InvalidStateException(
-        `BaseName mismatch: stored="${this.baseName}", returned="${result}"`
+        `BaseName mismatch: stored="${stored}", returned="${result}"`
       );
       throw new ServiceFailureException(
         "Invalid state in getBaseName()",
